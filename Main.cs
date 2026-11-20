@@ -26,8 +26,8 @@ namespace MissingCraftingIconFix
 
     internal static class IconResolver
     {
-        private static readonly Dictionary<string, Texture2D> iconCache = new();
-        private static readonly HashSet<string> loggedBlueprints = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly Dictionary<string, Texture2D> iconCache = [];
+        private static readonly HashSet<string> loggedBlueprints = [with(StringComparer.OrdinalIgnoreCase)];
 
         private static void LogFixOnce(string blueprintName, string sourceDetail)
         {
@@ -79,7 +79,7 @@ namespace MissingCraftingIconFix
 
             GameObject targetObj = bpi.m_CraftedResultGear != null
                 ? bpi.m_CraftedResultGear.gameObject
-                : (bpi.m_CraftedResultDecoration != null ? bpi.m_CraftedResultDecoration.gameObject : null);
+                : (bpi.m_CraftedResultDecoration?.gameObject);
 
             if (targetObj != null)
             {
@@ -119,8 +119,10 @@ namespace MissingCraftingIconFix
         private static Texture2D BuildProceduralIcon(string name)
         {
             const int size = 128;
-            Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            Texture2D tex = new(size, size, TextureFormat.RGBA32, false)
+            {
+                hideFlags = HideFlags.DontUnloadUnusedAsset
+            };
 
             uint hash = 2166136261;
             foreach (char c in name)
@@ -132,7 +134,7 @@ namespace MissingCraftingIconFix
 
             Color bg = Color.HSVToRGB(hue, 0.45f, 0.30f);
             Color border = Color.HSVToRGB(hue, 0.60f, 0.78f);
-            Color emblem = new Color(0.95f, 0.95f, 0.95f, 1f);
+            Color emblem = new(0.95f, 0.95f, 0.95f, 1f);
 
             for (int y = 0; y < size; y++)
             {
@@ -178,7 +180,7 @@ namespace MissingCraftingIconFix
     [HarmonyPatch(
         typeof(TextureCache),
         nameof(TextureCache.GetAddressableTexture),
-        new Type[] { typeof(AssetReferenceTexture2D) }
+        [typeof(AssetReferenceTexture2D)]
     )]
     internal static class FixNullAddressableTexture
     {
